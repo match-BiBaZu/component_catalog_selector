@@ -9,16 +9,11 @@ Use the executable if you just want to run the selector without opening or editi
 The executable is:
 
 ```text
-dist\ComponentCatalogSelector.exe
+component_selector_ready2run\ComponentCatalogSelector.exe
 ```
 
 Place the full catalog folders in the same folder as the executable:
 
-```text
-dist\ComponentCatalogSelector.exe
-dist\FullCatalogSTEP
-dist\FullCatalogSTL
-```
 
 Then double-click `ComponentCatalogSelector.exe`.
 
