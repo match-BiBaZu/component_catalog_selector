@@ -43,7 +43,7 @@ class SplitSettingsMixin:
                 parent,
                 text=(
                     "The split is still controllable, but excluded values change which components are eligible "
-                    "for each folder. The live preview shows the files that will actually be copied."
+                    "for each folder. The slider targets the copied development/validation ratio and ignores unused files."
                 ),
                 foreground="#555555",
                 wraplength=720,
@@ -60,7 +60,7 @@ class SplitSettingsMixin:
 
         ttk.Label(
             parent,
-            text="No values are excluded from development; the live preview shows the random split size.",
+            text="No values are excluded from development; the live preview shows the balanced split size.",
             foreground="#555555",
             wraplength=720,
         ).grid(row=0, column=0, columnspan=3, sticky="w", pady=(0, 8))

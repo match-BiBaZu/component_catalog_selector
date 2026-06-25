@@ -9,7 +9,7 @@ from .models import Component, CopyResult, GeneralizationChoice, SplitResult
 class OutputMixin:
     def _generalization_selection_summary_lines(self) -> list[str]:
         if not self.confirmed_generalization_categories:
-            return ["Excluded from development catalog: none; the selected subset will be randomly split."]
+            return ["Excluded from development catalog: none; the selected subset will be balanced by category."]
 
         lines = ["Confirmed values excluded from development catalog:"]
         for category in CATEGORY_ORDER:
@@ -65,7 +65,7 @@ class OutputMixin:
         choices: dict[str, GeneralizationChoice],
     ) -> list[str]:
         if not choices:
-            return ["Excluded from development catalog: none; random split was used."]
+            return ["Excluded from development catalog: none; balanced split was used."]
 
         lines = ["Exclusion choices:"]
         for category in CATEGORY_ORDER:
@@ -91,7 +91,7 @@ class OutputMixin:
             f"{len(split_result.test_components)} validation"
         )
         if split_result.unused_components:
-            summary += f" / {len(split_result.unused_components)} unused due to exclusion constraints"
+            summary += f" / {len(split_result.unused_components)} unused after exclusion/balancing constraints"
         return summary
 
     def _copied_data_type_summary(self, copy_result: CopyResult) -> str:

@@ -17,8 +17,41 @@ class SplitStageMixin:
         if len(self.selected_components) < 2:
             return 0
         percent = self._selected_target_test_percent()
+        if self.confirmed_generalization_test_values:
+            return self._target_test_count_for_used_split(percent)
         test_count = round(len(self.selected_components) * (percent / 100))
         return max(1, min(test_count, len(self.selected_components) - 1))
+
+    def _target_test_count_for_used_split(self, percent: int) -> int:
+        target_share = percent / 100
+        train_candidates, _test_candidates, _choices = self.split_planner.holdout_candidate_counts(
+            components=self.selected_components,
+            holdout_values=self.confirmed_generalization_test_values,
+        )
+        best_count = 1
+        best_score: tuple[float, int, int] | None = None
+
+        for test_count in range(1, len(self.selected_components)):
+            train_candidate_test_count = self.split_planner.estimate_development_candidates_in_validation(
+                components=self.selected_components,
+                holdout_values=self.confirmed_generalization_test_values,
+                target_test_count=test_count,
+            )
+            train_count = max(0, train_candidates - train_candidate_test_count)
+            copied_count = train_count + test_count
+            if copied_count == 0:
+                continue
+
+            score = (
+                abs((test_count / copied_count) - target_share),
+                len(self.selected_components) - copied_count,
+                test_count,
+            )
+            if best_score is None or score < best_score:
+                best_score = score
+                best_count = test_count
+
+        return best_count
 
     def _update_target_test_percent_label(self, _value: str | None = None) -> None:
         percent = self._selected_target_test_percent()
@@ -45,7 +78,7 @@ class SplitStageMixin:
 
         text = f"Will copy: {preview.train_count} development / {preview.test_count} validation"
         if preview.unused_count:
-            text += f" / {preview.unused_count} unused due to exclusion constraints"
+            text += f" / {preview.unused_count} unused after exclusion/balancing constraints"
 
         if preview.holdout_active:
             text += (
@@ -77,7 +110,7 @@ class SplitStageMixin:
         ttk.Label(
             header,
             text=(
-                "Excluding categories from development can alter the overall number of components in "
+                "Exclusion and balancing constraints can alter the overall number of components in "
                 "DevelopmentSet and ValidationSet."
             ),
             foreground="#555555",

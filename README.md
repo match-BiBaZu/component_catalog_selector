@@ -105,13 +105,13 @@ Example goal: create a validation set that contains circular components with ext
 
    Select categories to exclude from the development catalog only if you want to validate generalisation to those categories. For this example:
 
-   - If you want every selected circle/external component to be split randomly, leave all exclusions unchecked.
-   - If you want to validate generalisation to a specific value, check that value so it is excluded from development and added to validation. Values left unchecked can still be randomly split into validation.
+   - If you want every selected circle/external component to be balanced without development exclusions, leave all exclusions unchecked.
+   - If you want to validate generalisation to a specific value, check that value so it is excluded from development. Validation is then balanced across the selected catalog, including values that are not allowed in development.
    - Click `Confirm exclusions`.
 
 4. Stage 3: Create split.
 
-   Choose the target validation share with the slider. The preview shows how many components will go to development and validation. Exclusions can change the final counts because some selected components may become ineligible for one side of the split.
+   Choose the target validation share with the slider. The preview shows how many components will go to development and validation. If exclusion and balancing constraints leave components unused, the slider targets the copied development/validation split and does not count unused components.
 
    Optionally enter a random seed such as `123` to make the split repeatable.
 
@@ -129,10 +129,10 @@ Example goal: create a validation set that contains circular components with ext
 ## GUI stages
 
 1. Select the subset of `FullCatalogSTEP` and `FullCatalogSTL` to use with checkboxes for data type, shape, aspect ratio, symmetry type, and feature type.
-2. Select characteristic values to exclude from `DevelopmentSet`. Excluded values are removed from the development folder and added to `ValidationSet`; unchecked values can still be randomly split into validation.
+2. Select characteristic values to exclude from `DevelopmentSet`. Excluded values are removed from the development folder, while validation is balanced across all selected category values as evenly as possible.
 3. Create the development/validation folders. The target validation-share slider is applied after the exclusion choices are confirmed.
 
-The validation slider is a percentage target for values that are still allowed in development. Excluded values are added to validation separately, so the final validation set can be larger than the slider target.
+The validation slider targets `ValidationSet / (DevelopmentSet + ValidationSet)`. Unused components are ignored for this percentage. Excluded values constrain which components can be copied to `DevelopmentSet`; they are not added on top of the validation target.
 
 ## ID format
 

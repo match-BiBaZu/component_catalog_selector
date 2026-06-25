@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import random
 from typing import Iterable
 
 from .metadata import CATEGORY_METADATA, category_sort_key
@@ -30,12 +29,6 @@ def scaled_counts(
     train_count = max(1, min(train_candidate_count, round(target_train_count * scale)))
     test_count = max(1, min(test_candidate_count, round(target_test_count * scale)))
     return train_count, test_count
-
-
-def sample_components(components: list[Component], count: int, rng: random.Random) -> list[Component]:
-    if count >= len(components):
-        return list(components)
-    return rng.sample(components, count)
 
 
 def format_codes(category: str, values: Iterable[str]) -> str:
