@@ -106,7 +106,7 @@ Example goal: create a validation set that contains circular components with ext
    Select categories to exclude from the development catalog only if you want to validate generalisation to those categories. For this example:
 
    - If you want every selected circle/external component to be split randomly, leave all exclusions unchecked.
-   - If you want to validate generalisation to a specific value, check that value so it is excluded from development and used as a validation candidate.
+   - If you want to validate generalisation to a specific value, check that value so it is excluded from development and added to validation. Values left unchecked can still be randomly split into validation.
    - Click `Confirm exclusions`.
 
 4. Stage 3: Create split.
@@ -129,10 +129,10 @@ Example goal: create a validation set that contains circular components with ext
 ## GUI stages
 
 1. Select the subset of `FullCatalogSTEP` and `FullCatalogSTL` to use with checkboxes for data type, shape, aspect ratio, symmetry type, and feature type.
-2. Select characteristic values to exclude from `DevelopmentSet`. Excluded values are removed from the development folder and are used only as validation candidates.
+2. Select characteristic values to exclude from `DevelopmentSet`. Excluded values are removed from the development folder and added to `ValidationSet`; unchecked values can still be randomly split into validation.
 3. Create the development/validation folders. The target validation-share slider is applied after the exclusion choices are confirmed.
 
-The validation slider is a percentage target. The split is still controllable, but exclusion choices change which components are eligible for each folder. The GUI shows a live preview of the actual files that will be copied, including any selected components that will remain unused because of exclusion constraints.
+The validation slider is a percentage target for values that are still allowed in development. Excluded values are added to validation separately, so the final validation set can be larger than the slider target.
 
 ## ID format
 

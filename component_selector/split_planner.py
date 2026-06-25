@@ -7,7 +7,6 @@ from .models import Component, GeneralizationChoice, SplitConfig, SplitPreview, 
 from .split_helpers import (
     clamped_test_count,
     sample_components,
-    scaled_counts,
     sort_components,
     validate_component_count,
     validate_holdout_values,
@@ -35,24 +34,25 @@ class SplitPlanner:
                 holdout_active=False,
             )
 
-        train_candidates, test_candidates, _choices = self._holdout_candidates(
+        train_candidates, holdout_candidates, _choices = self._holdout_candidates(
             components=components,
             holdout_values=holdout_values,
         )
-        train_count, test_count = scaled_counts(
+        fill_test_count = self._holdout_fill_test_count(
             selected_count=len(components),
             train_candidate_count=len(train_candidates),
-            test_candidate_count=len(test_candidates),
             target_test_count=target_test_count,
         )
+        test_count = len(holdout_candidates) + fill_test_count
+        train_count = len(train_candidates) - fill_test_count
 
         return SplitPreview(
             target_test_count=target_test_count,
             train_count=train_count,
             test_count=test_count,
-            unused_count=len(components) - train_count - test_count,
+            unused_count=0,
             train_candidate_count=len(train_candidates),
-            test_candidate_count=len(test_candidates),
+            test_candidate_count=len(components),
             holdout_active=True,
         )
 
@@ -110,18 +110,21 @@ class SplitPlanner:
         seed: int,
         rng: random.Random,
     ) -> SplitResult:
-        train_candidates, test_candidates, choices = self._holdout_candidates(
+        train_candidates, holdout_candidates, choices = self._holdout_candidates(
             components=components,
             holdout_values=holdout_values,
         )
-        train_count, test_count = scaled_counts(
+        selected_holdout_test = list(holdout_candidates)
+        fill_test_count = self._holdout_fill_test_count(
             selected_count=len(components),
             train_candidate_count=len(train_candidates),
-            test_candidate_count=len(test_candidates),
             target_test_count=target_test_count,
         )
-        selected_train = sample_components(train_candidates, train_count, rng)
-        selected_test = sample_components(test_candidates, test_count, rng)
+        selected_fill_test = sample_components(train_candidates, fill_test_count, rng)
+        selected_fill_paths = {component.path for component in selected_fill_test}
+
+        selected_train = [component for component in train_candidates if component.path not in selected_fill_paths]
+        selected_test = selected_holdout_test + selected_fill_test
         used_paths = {component.path for component in selected_train + selected_test}
         unused_components = [component for component in components if component.path not in used_paths]
 
@@ -133,6 +136,19 @@ class SplitPlanner:
             target_test_count=target_test_count,
             random_seed=seed,
         )
+
+    def _holdout_fill_test_count(
+        self,
+        selected_count: int,
+        train_candidate_count: int,
+        target_test_count: int,
+    ) -> int:
+        if train_candidate_count < 2:
+            return 0
+
+        target_share = target_test_count / selected_count
+        fill_count = round(train_candidate_count * target_share)
+        return max(1, min(fill_count, train_candidate_count - 1))
 
     def _holdout_candidates(
         self,
