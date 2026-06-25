@@ -223,7 +223,7 @@ class SplitPlanner:
 
         while improved:
             improved = False
-            best_swap: tuple[tuple[float, float, int, float, float, float, float], str, str, int, int] | None = None
+            best_swap: tuple[tuple[float, float, int, float, float, float], str, str, int, int] | None = None
 
             for selected_index, selected_component in enumerate(selected_components):
                 for unselected_index, unselected_component in enumerate(unselected_components):
@@ -268,7 +268,7 @@ class SplitPlanner:
         selected_test: list[Component],
         required_test_values: dict[str, set[str]],
         preferred_test_values: dict[str, set[str]],
-    ) -> tuple[float, float, int, float, float, float, float]:
+    ) -> tuple[float, float, int, float, float, float]:
         selected_test_paths = {component.path for component in selected_test}
         remaining_train_candidates = [
             component for component in train_candidates if component.path not in selected_test_paths
@@ -283,9 +283,9 @@ class SplitPlanner:
         )
 
         if remaining_train_candidates:
-            train_values_by_category = self._values_by_category(remaining_train_candidates)
+            train_values_by_category = self._values_by_category(train_candidates)
             train_availability_counts = self._category_counts(
-                remaining_train_candidates,
+                train_candidates,
                 train_values_by_category,
             )
             train_key = self._balance_key(
@@ -298,13 +298,12 @@ class SplitPlanner:
             train_key = (0.0, 0.0, 0.0)
 
         return (
-            test_key[0],
-            train_key[0],
+            max(test_key[0], train_key[0]),
+            test_key[0] + train_key[0],
             -len(remaining_train_candidates),
-            test_key[1],
-            train_key[1],
-            test_key[2],
-            train_key[2],
+            test_key[1] + train_key[1],
+            test_key[2] + train_key[2],
+            test_key[0],
         )
 
     def _select_balanced_components(
@@ -472,7 +471,8 @@ class SplitPlanner:
         availability_counts: dict[str, dict[str, int]],
         preferred_values: dict[str, set[str]],
     ) -> tuple[float, float, float]:
-        score = 0.0
+        total_score = 0.0
+        worst_category_score = 0.0
         preferred_value_deficit_penalty = 0.0
         rare_value_deficit_penalty = 0.0
         for category, values in values_by_category.items():
@@ -484,14 +484,17 @@ class SplitPlanner:
                 value = component.value_for(category)
                 if value in counts:
                     counts[value] += 1
-            score += sum((count - expected_count) ** 2 for count in counts.values()) / len(values)
+            category_score = sum((count - expected_count) ** 2 for count in counts.values()) / len(values)
+            total_score += category_score
+            worst_category_score = max(worst_category_score, category_score)
             for value, count in counts.items():
                 if count < expected_count:
                     if value in preferred_values.get(category, set()):
                         preferred_value_deficit_penalty += expected_count - count
                     availability_count = max(1, availability_counts[category][value])
                     rare_value_deficit_penalty += (expected_count - count) / availability_count
-        return score, preferred_value_deficit_penalty, rare_value_deficit_penalty
+        balance_score = worst_category_score * 1000 + total_score
+        return balance_score, preferred_value_deficit_penalty, rare_value_deficit_penalty
 
     def _category_counts(
         self,
