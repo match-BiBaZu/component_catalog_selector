@@ -2,6 +2,8 @@
 
 This is a small selection tool for a 39-component catalog of industrially relevant STEP and STL components. Components are encoded by cross-section shape, aspect ratio, symmetry type, and feature type.
 
+![Alt text](Werkstueckkatalog_AP1.png?raw=true "Title")
+
 ## Run the executable
 
 Use the executable if you just want to run the selector without opening or editing the Python code.
