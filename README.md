@@ -4,6 +4,10 @@ This is a small selection tool for a 39-component catalog of industrially releva
 
 ![Alt text](Werkstueckkatalog_AP1.png?raw=true "Title")
 
+## Research paper
+
+This repository contains the 39-component CAD catalog and selector described in Dasha Shieff, Torge Kolditz and Annika Raatz, [The usual Suspects: A Geometrically Grounded Component Catalog for Benchmarking the Flexibility of Industrial Part Feeding Systems](https://match-bibazu.github.io/#paper-usual-suspects) (CIRPe 2026, camera-ready manuscript).
+
 ## Run the executable
 
 Use the executable if you just want to run the selector without opening or editing the Python code.
