@@ -4,6 +4,12 @@ This is a small selection tool for a 39-component catalog of industrially releva
 
 ![Alt text](Werkstueckkatalog_AP1.png?raw=true "Title")
 
+## Labelled workpiece examples
+
+The photo shows a selection of 3D-printed BiBaZu workpieces with their part IDs.
+
+![Eight 3D-printed workpieces with part IDs labelled in the photo](assets/bibazu-workpieces-labelled.png)
+
 ## Research paper
 
 This repository contains the 39-component CAD catalog and selector described in Dasha Shieff, Torge Kolditz and Annika Raatz, [The usual Suspects: A Geometrically Grounded Component Catalog for Benchmarking the Flexibility of Industrial Part Feeding Systems](https://match-bibazu.github.io/#paper-usual-suspects) (CIRPe 2026, camera-ready manuscript).
